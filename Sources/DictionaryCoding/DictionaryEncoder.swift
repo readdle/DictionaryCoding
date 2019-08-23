@@ -236,7 +236,11 @@ open class DictionaryEncoder {
       throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Top-level \(T.self) encoded as string Dictionary fragment."))
     }
     
-    return topLevel as! [String:Any]
+    guard let d = topLevel as? NSDictionary else {
+        throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Top-level \(T.self) not-encoded as NSDictionary."))
+    }
+    
+    return d.toStringAny()
   }
 
 }
@@ -913,3 +917,19 @@ fileprivate class _DictionaryReferencingEncoder : _DictionaryEncoder {
     }
 }
 
+public extension NSDictionary {
+    func toStringAny() -> [String: Any] {
+        var result = [String: Any]()
+        
+        enumerateKeysAndObjects { key, value, stop in
+            if let key = key as? String {
+                result[key] = value
+            }
+            else {
+                assert(false, "Incorrect cast NSDictionary to Dictionary (key is not Hashable)")
+            }
+        }
+        
+        return result
+    }
+}

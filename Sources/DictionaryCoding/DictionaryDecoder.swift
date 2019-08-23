@@ -952,9 +952,9 @@ extension _DictionaryDecoder {
         
         if let number = value as? NSNumber {
             
-            if number === kCFBooleanTrue as NSNumber {
+            if number === kCFBooleanTrue {
                 return true
-            } else if number === kCFBooleanFalse as NSNumber {
+            } else if number === kCFBooleanFalse {
                 return false
             } else {
                 return number != 0 // TODO: Add a flag to disallow non-boolean numbers?
@@ -1227,10 +1227,16 @@ extension _DictionaryDecoder {
             return UUID(uuidString: string)
         }
         
-        let cfType = CFGetTypeID(value as CFTypeRef)  // NB this could be dangerous - we're assuming that it's ok to call CFGetTypeID with the value, which may not be true
+        guard let cfTypeValue = value as? CFTypeRef else {
+            assert(false)
+            return nil
+        }
+        
+        let cfType = CFGetTypeID(cfTypeValue)
+        
         if cfType == CFUUIDGetTypeID() {
             let cfValue = value as! CFUUID
-            let string = CFUUIDCreateString(kCFAllocatorDefault, cfValue) as String
+            let string = CFUUIDCreateString(kCFAllocatorDefault, cfValue).swiftObject
             return UUID(uuidString: string)
         }
         
@@ -1358,3 +1364,15 @@ internal var _iso8601Formatter: ISO8601DateFormatter = {
     formatter.formatOptions = .withInternetDateTime
     return formatter
 }()
+
+extension CFString {
+    public var swiftObject: String {
+        #if os(Android)
+        return String._unconditionallyBridgeFromObjectiveC(
+            unsafeBitCast(self, to: NSString.self)
+        )
+        #else
+        return self as String
+        #endif
+    }
+}
