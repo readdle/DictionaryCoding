@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'DictionaryCoding'
-  s.version          = '1.0.7'
+  s.version          = '1.0.8'
   s.summary          = 'Swift Decoder/Encoder which converts to/from dictionaries.'
 
   s.description      = <<-DESC
