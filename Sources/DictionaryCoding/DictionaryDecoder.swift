@@ -110,7 +110,7 @@ open class DictionaryDecoder {
             guard !stringKey.isEmpty else { return stringKey }
             
             // Find the first non-underscore character
-            guard let firstNonUnderscore = stringKey.index(where: { $0 != "_" }) else {
+            guard let firstNonUnderscore = stringKey.firstIndex(where: { $0 != "_" }) else {
                 // Reached the end without finding an _
                 return stringKey
             }
@@ -1227,11 +1227,7 @@ extension _DictionaryDecoder {
             return UUID(uuidString: string)
         }
         
-        guard let cfTypeValue = value as? CFTypeRef else {
-            assert(false)
-            return nil
-        }
-        
+        let cfTypeValue = value as CFTypeRef        
         let cfType = CFGetTypeID(cfTypeValue)
         
         if cfType == CFUUIDGetTypeID() {
