@@ -21,6 +21,11 @@
 import CoreFoundation
 import Foundation
 
+#if os(Windows)
+private let kCFBooleanTrue = true._bridgeToObjectiveC()
+private let kCFBooleanFalse = false._bridgeToObjectiveC()
+#endif
+
 //===----------------------------------------------------------------------===//
 // Dictionary Decoder
 //===----------------------------------------------------------------------===//
@@ -1227,6 +1232,7 @@ extension _DictionaryDecoder {
             return UUID(uuidString: string)
         }
         
+        #if !os(Windows)
         let cfTypeValue = value as CFTypeRef        
         let cfType = CFGetTypeID(cfTypeValue)
         
@@ -1235,6 +1241,7 @@ extension _DictionaryDecoder {
             let string = CFUUIDCreateString(kCFAllocatorDefault, cfValue).swiftObject
             return UUID(uuidString: string)
         }
+        #endif
         
         throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
     }
@@ -1361,6 +1368,7 @@ internal var _iso8601Formatter: ISO8601DateFormatter = {
     return formatter
 }()
 
+#if !os(Windows)
 extension CFString {
     public var swiftObject: String {
         #if os(Android)
@@ -1372,3 +1380,4 @@ extension CFString {
         #endif
     }
 }
+#endif
