@@ -1363,7 +1363,7 @@ internal var _iso8601Formatter: ISO8601DateFormatter = {
 
 extension CFString {
     public var swiftObject: String {
-        #if os(Android)
+        #if os(Android) || os(Linux)
         return String._unconditionallyBridgeFromObjectiveC(
             unsafeBitCast(self, to: NSString.self)
         )
